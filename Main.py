@@ -7,14 +7,14 @@ import math
 import numpy as np
 import pathlib
 import mne
+from mne_icalabel import label_components
 import matplotlib.pyplot as plt
 from subfunctions import load_vhdr, get_behav
-from IPython import get_ipython
 import logging
+
 import autoreject
 from IPython.display import display,HTML
-from mne_icalabel import label_components
-
+from IPython import get_ipython
 get_ipython().run_line_magic('matplotlib', 'qt')
 
 
