@@ -220,7 +220,7 @@ epochs_for_ica_fit = epochs.copy().filter(l_freq=1, h_freq=None)
 # Fit ICA 
 ica = mne.preprocessing.ICA(random_state = 100)
 ica.fit(epochs_for_ica_fit)
-
+#TODO Make sure ICA is fitted right for ica_label
 ic_labels = label_components(epochs_for_ica_fit, ica, method="iclabel")
 labels = ic_labels["labels"]
 exclude_idx = [
@@ -268,7 +268,8 @@ epochs_ar, reject_log = ar.transform(epochs, return_log=True)
 fig = epochs[reject_log.bad_epochs].plot(scalings=dict(eeg=100e-6))
 
 #TODO Save fig to directory (error with incerting Path fname)
-#fig.grab().save(results_path/'Autoreject_Bad_Epochjs.png')
+save_path = results_path / 'Autoreject_Bad_Epochjs.png'
+fig.grab().save(str(save_path))
 
 
 reject_log.plot('horizontal')
