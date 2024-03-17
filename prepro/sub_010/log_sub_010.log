@@ -1,2 +1,7 @@
 2024-03-17 15:25:57,897 - INFO - Subject sub_010: Script started
 2024-03-17 15:26:07,154 - INFO - Subject sub_010: Script started
+2024-03-17 17:53:14,828 - INFO - Subject sub_010: Script started
+2024-03-17 17:55:23,426 - INFO - Raw loaded
+2024-03-17 17:57:55,668 - INFO - Resampled to 1000 Hz
+2024-03-17 17:57:56,699 - INFO - Number of detected trials (df_behav):96
+2024-03-17 17:57:57,481 - INFO - 576 Epoches created

@@ -138,6 +138,7 @@ sub_list = [1,2,3,4,5,6,8,9,10,11]
 log_format = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=log_format, level=logging.INFO)
 
+#TODO Add progress bar for subjects
 for sub_num in sub_list:
 
     #Set Paths
@@ -163,8 +164,10 @@ for sub_num in sub_list:
 
     # Add the file handler to the logger
     logger.addHandler(file_handler)
-    logger.info(f'Subject {sub_str}: Script started')
-    
+    msg = f'Subject {sub_str}: Script started'
+    logger.info(msg)
+    cprint(msg,'green')
+
     #===================Load Raw Data=======================
     
     vhdr_fname = data_path  /'EEG'/ f'{sub_str}_task_TEP.vhdr' 
