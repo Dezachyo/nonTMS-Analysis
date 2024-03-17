@@ -2,3 +2,13 @@ Data
 __pycache__
 .DS_Store
 .DS_Store
+.fif
+prepro/sub_001/prepro-epo.fif
+prepro/sub_002/prepro-epo.fif
+prepro/sub_003/prepro-epo.fif
+prepro/sub_004/prepro-epo.fif
+prepro/sub_002/Thumbs.db
+prepro/sub_004/Thumbs.db
+prepro/sub_001/Thumbs.db
+prepro/sub_003/Thumbs.db
+prepro/sub_011/Thumbs.db
