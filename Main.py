@@ -210,6 +210,8 @@ epochs = mne.Epochs(raw,
                     )
 logging.info(f'{len(epochs)} Epoches created')
 
+
+epochs = mne.set_eeg_referance(epochs)
 #%% ICA
 
 #Fit ICA for >1Hz signal.
@@ -218,9 +220,11 @@ epochs_for_ica_fit = epochs.copy().filter(l_freq=1, h_freq=None)
 
 
 # Fit ICA 
-ica = mne.preprocessing.ICA(random_state = 100)
-ica.fit(epochs_for_ica_fit)
 #TODO Make sure ICA is fitted right for ica_label
+ica = mne.preprocessing.ICA(method='infomax', fit_params=dict(extended=True),random_state = 100)
+ica.fit(epochs_for_ica_fit)
+
+
 ic_labels = label_components(epochs_for_ica_fit, ica, method="iclabel")
 labels = ic_labels["labels"]
 exclude_idx = [
