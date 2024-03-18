@@ -19,6 +19,11 @@ from scipy.signal import peak_widths
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as tick
 
+def get_sub_str(sub_num):
+    zeros = (3- len(str(sub_num)))*'0' 
+    sub_str = f'sub_'+zeros+f'{sub_num}'
+    return sub_str
+
 def get_behav(sub_num):
     
     current_path = pathlib.Path().absolute()
