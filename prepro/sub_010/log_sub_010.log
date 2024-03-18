@@ -5,3 +5,18 @@
 2024-03-17 17:57:55,668 - INFO - Resampled to 1000 Hz
 2024-03-17 17:57:56,699 - INFO - Number of detected trials (df_behav):96
 2024-03-17 17:57:57,481 - INFO - 576 Epoches created
+2024-03-17 18:03:17,410 - INFO - ICA comp rejected [(0, 'eye blink'), (1, 'eye blink'), (2, 'channel noise'), (5, 'muscle artifact'), (6, 'muscle artifact'), (7, 'muscle artifact'), (8, 'muscle artifact'), (9, 'muscle artifact'), (11, 'muscle artifact'), (12, 'muscle artifact'), (13, 'muscle artifact'), (14, 'muscle artifact'), (15, 'muscle artifact'), (16, 'muscle artifact'), (17, 'muscle artifact'), (19, 'muscle artifact'), (20, 'muscle artifact'), (22, 'muscle artifact'), (23, 'muscle artifact'), (24, 'channel noise'), (27, 'muscle artifact'), (28, 'muscle artifact'), (29, 'muscle artifact'), (31, 'muscle artifact'), (32, 'muscle artifact'), (36, 'muscle artifact'), (38, 'muscle artifact'), (41, 'muscle artifact'), (44, 'eye blink'), (53, 'muscle artifact')]
+2024-03-17 18:03:17,422 - INFO - Running Autoreject
+2024-03-17 18:05:32,319 - INFO - QSS file sucessfuly loaded.
+2024-03-17 18:05:32,320 - INFO - Found version patches to be applied.
+2024-03-17 18:05:32,321 - INFO - Found application patches to be applied.
+2024-03-17 18:05:33,847 - INFO -    droped        Key
+0       4     object
+1       2    feature
+2       3      scene
+3       7    binding
+4       2   baseline
+5      20  retrieval
+2024-03-17 18:05:33,849 - INFO - Autoreject completed, 576 epochs rejected
+2024-03-17 18:05:33,850 - INFO - Autoreject Completed
+2024-03-17 18:05:37,892 - INFO - 538 Epochs Saved To Disc
