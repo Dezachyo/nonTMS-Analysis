@@ -20,3 +20,26 @@
 2024-03-17 18:17:57,860 - INFO - Autoreject completed, 576 epochs rejected
 2024-03-17 18:17:57,860 - INFO - Autoreject Completed
 2024-03-17 18:17:59,804 - INFO - 468 Epochs Saved To Disc
+2024-03-18 12:17:52,428 - INFO - Subject sub_011: Script started
+2024-03-18 12:20:19,746 - INFO - Raw loaded
+2024-03-18 12:23:15,439 - INFO - Resampled to 1000 Hz
+2024-03-18 12:32:06,115 - INFO - Subject sub_011: Script started
+2024-03-18 12:34:45,225 - INFO - Raw loaded
+2024-03-18 12:37:24,140 - INFO - Resampled to 1000 Hz
+2024-03-18 12:37:25,298 - INFO - Number of detected trials (df_behav):96
+2024-03-18 12:37:26,054 - INFO - 576 Epoches created
+2024-03-18 12:42:44,954 - INFO - ICA comp rejected [(0, 'eye blink'), (1, 'eye blink'), (2, 'muscle artifact'), (3, 'muscle artifact'), (4, 'muscle artifact'), (5, 'muscle artifact'), (6, 'eye blink'), (8, 'muscle artifact'), (9, 'muscle artifact'), (10, 'muscle artifact'), (11, 'muscle artifact'), (12, 'muscle artifact'), (13, 'muscle artifact'), (14, 'muscle artifact'), (15, 'muscle artifact'), (17, 'muscle artifact'), (18, 'muscle artifact'), (20, 'muscle artifact'), (21, 'muscle artifact'), (22, 'muscle artifact'), (23, 'muscle artifact'), (26, 'muscle artifact'), (29, 'muscle artifact'), (42, 'muscle artifact'), (43, 'muscle artifact'), (47, 'muscle artifact'), (54, 'muscle artifact'), (61, 'channel noise')]
+2024-03-18 12:42:44,967 - INFO - Running Autoreject
+2024-03-18 12:44:55,404 - INFO - No OpenGL_accelerate module loaded: No module named 'OpenGL_accelerate'
+2024-03-18 12:44:59,217 - INFO - QSS file sucessfuly loaded.
+2024-03-18 12:44:59,217 - INFO - Found version patches to be applied.
+2024-03-18 12:44:59,219 - INFO - Found application patches to be applied.
+2024-03-18 12:45:00,535 - INFO -    droped        Key
+0      26     object
+1      11    feature
+2      15      scene
+3      16    binding
+4      25   baseline
+5      15  retrieval
+2024-03-18 12:45:00,539 - INFO - Autoreject completed, 576 epochs rejected
+2024-03-18 12:45:00,540 - INFO - Autoreject Completed

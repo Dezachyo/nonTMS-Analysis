@@ -18,7 +18,7 @@ from IPython import get_ipython
 get_ipython().run_line_magic('matplotlib', 'qt')
 
 
-def add_trial_numbers(metadata):
+def add_trial_numbers(metadata,df_behav):
     """For a metadata created from annotations, for multiple conditions
 
     Args:
@@ -36,7 +36,13 @@ def add_trial_numbers(metadata):
         trial_numbers.append(trial_num)
 
     metadata['trial_num'] = trial_numbers
-    metadata.loc[metadata['event_name'] == 'retrieval', 'trial_num'] = None
+    # Add trial num to retrieval epochs
+    metadata.loc[metadata['event_name'] == 'retrieval', 'trial_num'] = None # Zero out all retriveal rows
+    
+    df_behav_ret_sort = df_behav.sort_values(by='trl_no_ret')
+    
+    retrieval_metadata = metadata[metadata['event_name'] == 'retrieval'] # get only retriveal rows, use its indexs next line
+    metadata.loc[retrieval_metadata.index,'trial_num'] = list(df_behav_ret_sort['trial_num'])
     return metadata, max(trial_numbers)
 
 
@@ -131,7 +137,7 @@ event_dict = {'object': 31,
               'retrieval' : 41,
               }
 
-sub_list = [1,2,3,4,5,6,8,9,10,11]
+sub_list = [11]
 
 
 # Set up logging configuration
@@ -173,7 +179,7 @@ for sub_num in sub_list:
     vhdr_fname = data_path  /'EEG'/ f'{sub_str}_task_TEP.vhdr' 
     raw = load_vhdr(vhdr_fname,load_montage=True, EOG_ch=False)
     df_behav = get_behav(sub_num)
-    
+    df_behav['trial_num'] =  range(1,len(df_behav)+1)# add a trial num column 
     logging.info('Raw loaded')
 
     raw = raw.resample(prepro_args['resample'])
@@ -198,7 +204,7 @@ for sub_num in sub_list:
         sfreq=raw.info["sfreq"],
     )
 
-    metadata_with_trial_num, num_trials = add_trial_numbers(metadata)
+    metadata_with_trial_num, num_trials = add_trial_numbers(metadata,df_behav)
 
     if num_trials == 96:
         message = f"Number of detected trials (df_behav):{num_trials}"
@@ -210,7 +216,7 @@ for sub_num in sub_list:
         logging.info(message)
 
     #add behavioral measurments to metadata
-    df_behav['trial_num'] =  range(1,num_trials+1)# add a trial num column 
+    #df_behav['trial_num'] =  range(1,num_trials+1)# add a trial num column 
     metadata_combined = pd.merge(metadata_with_trial_num, df_behav, on='trial_num', how='left')
     #TODO use data from df_behav to add trial num for ret events 
 
