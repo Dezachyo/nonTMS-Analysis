@@ -137,7 +137,7 @@ event_dict = {'object': 31,
               'retrieval' : 41,
               }
 
-sub_list = [11]
+sub_list = [1,2,3,4,5,6,8,9,10,11]
 
 
 # Set up logging configuration
@@ -174,6 +174,8 @@ for sub_num in sub_list:
     logger.info(msg)
     cprint(msg,'green')
 
+    logger.info(prepro_args)
+    
     #===================Load Raw Data=======================
     
     vhdr_fname = data_path  /'EEG'/ f'{sub_str}_task_TEP.vhdr' 
@@ -191,6 +193,15 @@ for sub_num in sub_list:
 
 
     events_from_annot,_ = mne.events_from_annotations(raw)
+    
+    # Make sure the first event is baseline (61), remove pre-block events
+    index = np.argmax(events_from_annot[:, -1] == 61)
+    events_from_annot = events_from_annot[index:]
+    if index >0:
+        msg = f'{index+1} Pre-Experiment events identified and removed'
+        cprint(msg,'red')
+        logging.info(msg)
+    
     selected_events = [x for x in events_from_annot if x[2] in event_dict.values()]
     # Just a trick to make it np.array for MNE
     selected_events = np.array(selected_events).tolist()

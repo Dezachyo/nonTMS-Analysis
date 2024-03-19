@@ -40,3 +40,27 @@
 2024-03-17 16:12:51,552 - INFO - Autoreject completed, 581 epochs rejected
 2024-03-17 16:12:51,553 - INFO - Autoreject Completed
 2024-03-17 16:12:53,996 - INFO - 566 Epochs Saved To Disc
+2024-03-18 15:41:15,224 - INFO - Subject sub_001: Script started
+2024-03-18 15:41:15,226 - INFO - {'resample': 1000, 'tmin': -0.6, 'tmax': 1, 'baseline': None, 'drop ica': ['eye blink', 'muscle artifact', 'channel noise']}
+2024-03-18 15:42:13,733 - INFO - Raw loaded
+2024-03-18 15:46:41,835 - INFO - Resampled to 1000 Hz
+2024-03-18 16:10:20,687 - INFO - Subject sub_001: Script started
+2024-03-18 16:10:20,689 - INFO - {'resample': 1000, 'tmin': -0.6, 'tmax': 1, 'baseline': None, 'drop ica': ['eye blink', 'muscle artifact', 'channel noise']}
+2024-03-18 16:11:33,355 - INFO - Raw loaded
+2024-03-18 16:15:47,879 - INFO - Resampled to 1000 Hz
+2024-03-18 16:15:49,240 - INFO - 10 Pre-Experiment events identified and removed
+2024-03-18 16:15:50,353 - INFO - Number of detected trials (df_behav):96
+2024-03-18 16:15:51,785 - INFO - 576 Epoches created
+2024-03-18 16:31:12,937 - INFO - ICA comp rejected [(0, 'eye blink'), (1, 'eye blink'), (2, 'muscle artifact'), (5, 'muscle artifact'), (7, 'muscle artifact'), (8, 'muscle artifact'), (9, 'muscle artifact'), (15, 'muscle artifact'), (16, 'muscle artifact'), (19, 'eye blink'), (20, 'muscle artifact'), (21, 'muscle artifact'), (22, 'muscle artifact'), (25, 'muscle artifact'), (27, 'muscle artifact'), (31, 'muscle artifact'), (33, 'eye blink'), (39, 'eye blink'), (44, 'eye blink'), (47, 'muscle artifact'), (52, 'muscle artifact'), (54, 'channel noise'), (59, 'eye blink')]
+2024-03-18 16:31:12,963 - INFO - Running Autoreject
+2024-03-18 16:33:37,396 - INFO - No OpenGL_accelerate module loaded: No module named 'OpenGL_accelerate'
+2024-03-18 16:33:40,332 - INFO -    droped        Key
+0       4     object
+1       0    feature
+2       1      scene
+3       0    binding
+4       2   baseline
+5      11  retrieval
+2024-03-18 16:33:40,333 - INFO - Autoreject completed, 576 epochs rejected
+2024-03-18 16:33:40,334 - INFO - Autoreject Completed
+2024-03-18 16:33:40,740 - INFO - 558 Epochs Saved To Disc

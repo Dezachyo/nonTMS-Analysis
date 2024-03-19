@@ -20,3 +20,22 @@
 2024-03-17 16:28:22,795 - INFO - Autoreject completed, 576 epochs rejected
 2024-03-17 16:28:22,796 - INFO - Autoreject Completed
 2024-03-17 16:28:25,327 - INFO - 573 Epochs Saved To Disc
+2024-03-18 16:33:40,740 - INFO - Subject sub_002: Script started
+2024-03-18 16:33:40,741 - INFO - {'resample': 1000, 'tmin': -0.6, 'tmax': 1, 'baseline': None, 'drop ica': ['eye blink', 'muscle artifact', 'channel noise']}
+2024-03-18 16:34:29,541 - INFO - Raw loaded
+2024-03-18 16:38:08,651 - INFO - Resampled to 1000 Hz
+2024-03-18 16:38:09,913 - INFO - 4 Pre-Experiment events identified and removed
+2024-03-18 16:38:10,540 - INFO - Number of detected trials (df_behav):96
+2024-03-18 16:38:11,339 - INFO - 576 Epoches created
+2024-03-18 17:07:06,829 - INFO - ICA comp rejected [(0, 'eye blink'), (2, 'muscle artifact'), (4, 'muscle artifact'), (5, 'eye blink'), (6, 'muscle artifact'), (7, 'muscle artifact'), (9, 'muscle artifact'), (11, 'muscle artifact'), (13, 'muscle artifact'), (14, 'muscle artifact'), (15, 'muscle artifact'), (16, 'muscle artifact'), (17, 'muscle artifact'), (20, 'muscle artifact'), (21, 'muscle artifact'), (22, 'eye blink'), (23, 'muscle artifact'), (25, 'muscle artifact'), (26, 'muscle artifact'), (31, 'muscle artifact'), (36, 'muscle artifact'), (38, 'muscle artifact'), (39, 'muscle artifact'), (40, 'muscle artifact'), (55, 'channel noise'), (56, 'channel noise'), (59, 'eye blink')]
+2024-03-18 17:07:06,850 - INFO - Running Autoreject
+2024-03-18 17:09:56,680 - INFO -    droped        Key
+0       0     object
+1       0    feature
+2       0      scene
+3       0    binding
+4       0   baseline
+5       3  retrieval
+2024-03-18 17:09:56,682 - INFO - Autoreject completed, 576 epochs rejected
+2024-03-18 17:09:56,682 - INFO - Autoreject Completed
+2024-03-18 17:09:57,213 - INFO - 573 Epochs Saved To Disc
