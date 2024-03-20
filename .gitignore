@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 *.DS_Store
 *.fif
+*.h5
 prepro/sub_001/prepro-epo.fif
 prepro/sub_002/prepro-epo.fif
 prepro/sub_003/prepro-epo.fif

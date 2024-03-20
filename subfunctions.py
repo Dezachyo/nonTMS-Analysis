@@ -19,6 +19,22 @@ from scipy.signal import peak_widths
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as tick
 
+from IPython.display import display,HTML
+from IPython import get_ipython
+
+def cprint(text, color='white'):
+    colors = {
+        'red': '#FF0000',
+        'green': '#00FF00',
+        'white': '#FFFFFF'
+    }
+    
+    if color not in colors:
+        raise ValueError("Invalid color. Choose from 'red', 'green', or 'white'.")
+    
+    #return HTML(f"<font color='{colors[color]}'>{text}</font>")
+    display(HTML(f"<font color='{colors[color]}'>{text}</font>"))
+
 def get_sub_str(sub_num):
     zeros = (3- len(str(sub_num)))*'0' 
     sub_str = f'sub_'+zeros+f'{sub_num}'
