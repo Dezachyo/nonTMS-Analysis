@@ -6,11 +6,18 @@ and computes comodulograms with several methods.
 
 A comodulogram shows the estimated PAC metric on a grid of frequency bands.
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from pactools import Comodulogram, REFERENCES
 from pactools import simulate_pac
+
+from tensorpac import Pac
+from tensorpac.signals import pac_signals_wavelet
+
+from mne.stats import permutation_cluster_test
+
 from subfunctions import load_vhdr,get_sub_str
 import mne
 import pathlib
@@ -30,13 +37,20 @@ save_path = data_path / fname
 # Read preprocessed data
 epochs_tep = mne.read_epochs(save_path)
 
-epochs_tep.resample(200)
+resample_fs = None
+
+if resample_fs is not None:
+    epochs_tep.resample(resample_fs)   
+else:
+    resample_fs = epochs_tep.info['sfreq']
+    
+
 signal = epochs_tep['binding']._data[20,6,:]
-fs = epochs_tep.info['sfreq']
+
 ###############################################################################
 # Let's first create an artificial signal with PAC.
 
-fs = 200.  # Hz
+fs = resample_fs  # Hz 200 originaly
 high_fq = 50.0  # Hz
 low_fq = 5.0  # Hz
 low_fq_width = 1.0  # Hz
@@ -80,3 +94,59 @@ for ax, method in zip(axs, methods):
     estimator.plot(titles=[REFERENCES[method]], axs=[ax])
 
 plt.show()
+
+
+#%% TensorPac
+
+epochs_signal = epochs_tep['binding']._data[0:60,25,:]*10e5
+
+
+###############################################################################
+# Compute the single trial PAC on both datasets
+###############################################################################
+# once the datasets created, we can now extract the PAC, computed across
+# time-points for each trials and across several phase and amplitude
+# frequencies
+
+# create the pac object. Use the Gaussian-Copula PAC
+p = Pac(idpac=(2, 0, 0), f_pha='hres', f_amp='hres', dcomplex='wavelet')
+# compute pac for both dataset
+pac_1 = p.filterfit(resample_fs, epochs_signal, n_jobs=-1)
+
+plt.figure()
+p.comodulogram(pac_1)
+
+###############################################################################
+# Compute the single trial PAC on both datasets
+###############################################################################
+# once the datasets created, we can now extract the PAC, computed across
+# time-points for each trials and across several phase and amplitude
+# frequencies
+
+# create the pac object. Use the Gaussian-Copula PAC
+p = Pac(idpac=(2, 0, 0), f_pha='hres', f_amp='hres', dcomplex='wavelet')
+# compute pac for both dataset
+pac_1 = p.filterfit(resample_fs, epochs_signal, n_jobs=-1)
+
+plt.figure()
+p.comodulogram(pac_1)
+
+from tensorpac.utils import BinAmplitude
+
+plt.figure(figsize=(14, 5))
+
+plt.subplot(121)
+b_obj = BinAmplitude(epochs_signal, fs, f_pha=[9, 11], f_amp=[40, 70], n_jobs=1,
+                     n_bins=18)
+ax = b_obj.plot(color='red', alpha=.5, unit='deg')
+plt.ylim(0, 180)
+plt.title("Binned amplitude (phase=[9, 11])")
+
+plt.subplot(122)
+b_obj = BinAmplitude(epochs_signal, fs, f_pha=[4, 8], f_amp=[40, 70], n_jobs=1,
+                     n_bins=18)
+ax = b_obj.plot(color='blue', alpha=.5, unit='deg')
+plt.ylim(0, 180)
+plt.title("Binned amplitude (phase=[4, 8])")
+
+b_obj.show()
