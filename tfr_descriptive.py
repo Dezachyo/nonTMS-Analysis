@@ -18,45 +18,7 @@ from subfunctions import get_sub_str, cprint
 
 from IPython import get_ipython
 get_ipython().run_line_magic('matplotlib', 'qt')
-# %%
 
-sub_list = [1,2,3,4,5,6,8,9,10,11]
-# Define file paths and subject list
-current_path = pathlib.Path().absolute()
-results_path = current_path / 'TFR'
-subject_list = [1, 3]  # List of subjects or conditions
-tfr_files = [results_path /get_sub_str(sub_num) /f'{get_sub_str(sub_num)}-tfr.h5' for sub_num in sub_list]
-
-# Read the TFR data
-
-for fname in tfr_files:
-    tfr = mne.time_frequency.read_tfrs(fname)
-    plot_tfr_conditions(tfr[0], 'POz')
-    del(tfr)
-    
-
-#tfr_group = [mne.time_frequency.read_tfrs(fname)[0] for fname in tfr_files]
-#tfr_dict =  dict(zip(sub_list, tfr_group))
-
-
-
-tfr['binding'].average().plot_joint(
-    baseline=(-0.4, 0.02), mode="mean", tmin=-0.5, tmax=2, timefreqs=[(0.2,6.5),(0.5, 10), (0.3, 10)]
-)
-
-
-# %%
-
-below_median_tfrs = [tfr_dict[sub].average() for sub in below_median['Subject Number']]
-above_median_tfrs = [tfr_dict[sub].average() for sub in above_median['Subject Number']]
-
-#%%
-
-grand_below =  mne.grand_average(below_median_tfrs)
-grand_above =  mne.grand_average(above_median_tfrs)
-
-
-#%% ==================== condition comparison (with mne ploting) =========
 
 def plot_tfr_conditions(tfr, channel_name, baseline=(-0.4, 0), baseline_mode='percent'):
     """
@@ -111,6 +73,65 @@ def plot_tfr_conditions(tfr, channel_name, baseline=(-0.4, 0), baseline_mode='pe
     # Adjust layout
     plt.tight_layout(rect=[0, 0, 0.9, 1])
     plt.show()
+    return fig
+
+# %%
+
+sub_list = [1,2,3,4,5,6,8,9,10,11]
+#sub_list = [8]
+# Define file paths and subject list
+current_path = pathlib.Path().absolute()
+results_path = current_path / 'TFR'
+subject_list = [1, 3]  # List of subjects or conditions
+tfr_files = [results_path /get_sub_str(sub_num) /f'{get_sub_str(sub_num)}-tfr.h5' for sub_num in sub_list]
+
+# Read the TFR data
+group_tfr = []
+for fname,sub_num in zip(tfr_files,sub_list):
+    tfr = mne.time_frequency.read_tfrs(fname)
+    #plot_tfr_conditions(tfr[0], 'POz')
+    fig = plot_tfr_conditions(tfr[0], 'POz',baseline_mode='logratio')
+    fig.suptitle(f'subjct {sub_num}')
+    
+    conditions = tfr[0].metadata['event_name'].unique()
+    tfr_avg = {condition: tfr[0][condition].average() for condition in conditions}
+    group_tfr.append(tfr_avg)
+    del(tfr)
+
+#%%
+occ_picks = ['PO4','PO8','POz','O2','Oz','PO3','Pz']
+
+for condition in conditions:
+    grand = mne.grand_average([tfr_dict[condition] for tfr_dict in group_tfr])
+    grand.plot_topo(baseline=(-0.4, 0),mode="logratio", title = condition)
+    grand.plot(baseline=(-0.4, 0),mode="logratio", picks=occ_picks,combine='mean', title = condition + f'\n{occ_picks}')
+    
+
+#%%
+
+#tfr_group = [mne.time_frequency.read_tfrs(fname)[0] for fname in tfr_files]
+#tfr_dict =  dict(zip(sub_list, tfr_group))
+
+
+
+tfr['binding'].average().plot_joint(
+    baseline=(-0.4, 0.02), mode="mean", tmin=-0.5, tmax=2, timefreqs=[(0.2,6.5),(0.5, 10), (0.3, 10)]
+)
+
+
+# %%
+
+below_median_tfrs = [tfr_dict[sub].average() for sub in below_median['Subject Number']]
+above_median_tfrs = [tfr_dict[sub].average() for sub in above_median['Subject Number']]
+
+#%%
+
+grand_below =  mne.grand_average(below_median_tfrs)
+grand_above =  mne.grand_average(above_median_tfrs)
+
+
+#%% ==================== condition comparison (with mne ploting) =========
+
 
 #%% ==================== condition comparison (no baseline) =========
 
