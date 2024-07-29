@@ -91,3 +91,65 @@ def save_tfr_ch_figs(tfr_avg,sub_path,condition):
      
 
 tfr_both = mne.time_frequency.read_tfrs(save_path)
+
+
+#%%
+
+
+
+
+#%%
+
+# Function to calculate FWHM based on frequency
+def calculate_fwhm(f):
+    return 0.5 - (0.5 - 0.2) * (f - 3) / (80 - 3)
+
+sub_list = [1,2,3,4,5,6,8,9,10,11]
+
+decim = 4
+
+# Define frequencies and cycles
+frequencies = np.logspace(np.log10(3), np.log10(80), 60)
+cycles = [f * calculate_fwhm(f) for f in frequencies]
+
+#freqs = np.arange(4, 30, 2)  # define frequencies of interest
+#n_cycles = 2
+#n_cycles = freqs / 2.0  # different number of cycle per frequency
+
+for sub_num in tqdm(sub_list):
+
+    sub_str = get_sub_str(sub_num)
+    current_path = pathlib.Path().absolute()
+    data_path = current_path / 'prepro' / sub_str
+
+    fname = f'{sub_str}_prepro-epo.fif'
+    save_path = data_path / fname
+    # Read preprocessed data
+    epochs_tep = mne.read_epochs(save_path)
+
+    tfr = tfr_morlet(
+        epochs_tep,
+        frequencies,
+        n_cycles=cycles,
+        return_itc=False,
+        average=False,
+        use_fft = True
+    )
+
+    tfr["binding"].average().plot_topo(baseline=(-0.45, -0.1),
+                                       mode="percent",
+                                       title=f"Subject {sub_num} \n Average power (binding)")
+
+    # Save trf to disc
+    results_path = current_path/'TFR'/sub_str  
+    results_path.mkdir(parents=True, exist_ok=True) # Make Directory to save results in
+
+    fname_tfr = f'{sub_str}-tfr_80.h5'
+
+    tfr.save(results_path/fname_tfr ,overwrite=True)
+    cprint(f'Subject {sub_num} TFR Saved to disc ','green')
+
+
+
+
+# %%

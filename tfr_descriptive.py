@@ -99,7 +99,7 @@ for fname,sub_num in zip(tfr_files,sub_list):
     del(tfr)
 
 #%%
-occ_picks = ['PO4','PO8','POz','O2','Oz','PO3','Pz']
+occ_picks = ['PO4','PO8','POz','O2','Oz','PO3','PO7','Pz','Oz']
 
 for condition in conditions:
     grand = mne.grand_average([tfr_dict[condition] for tfr_dict in group_tfr])
