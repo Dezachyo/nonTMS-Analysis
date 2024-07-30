@@ -93,12 +93,9 @@ def save_tfr_ch_figs(tfr_avg,sub_path,condition):
 tfr_both = mne.time_frequency.read_tfrs(save_path)
 
 
-#%%
 
 
-
-
-#%%
+#%% 3-80 Hz TFRs like the paper
 
 # Function to calculate FWHM based on frequency
 def calculate_fwhm(f):
@@ -133,11 +130,12 @@ for sub_num in tqdm(sub_list):
         n_cycles=cycles,
         return_itc=False,
         average=False,
-        use_fft = True
+        use_fft = True,
+        decim = decim
     )
 
     tfr["binding"].average().plot_topo(baseline=(-0.45, -0.1),
-                                       mode="percent",
+                                       mode="logratio",
                                        title=f"Subject {sub_num} \n Average power (binding)")
 
     # Save trf to disc

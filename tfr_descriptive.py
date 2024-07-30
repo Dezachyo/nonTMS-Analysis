@@ -82,7 +82,10 @@ sub_list = [1,2,3,4,5,6,8,9,10,11]
 # Define file paths and subject list
 current_path = pathlib.Path().absolute()
 results_path = current_path / 'TFR'
-subject_list = [1, 3]  # List of subjects or conditions
+
+figures_path = current_path / 'Figures'
+figures_path.mkdir(exist_ok=True)
+
 tfr_files = [results_path /get_sub_str(sub_num) /f'{get_sub_str(sub_num)}-tfr.h5' for sub_num in sub_list]
 
 # Read the TFR data
@@ -92,6 +95,11 @@ for fname,sub_num in zip(tfr_files,sub_list):
     #plot_tfr_conditions(tfr[0], 'POz')
     fig = plot_tfr_conditions(tfr[0], 'POz',baseline_mode='logratio')
     fig.suptitle(f'subjct {sub_num}')
+
+   # Save the figure
+    subject_figures_path = figures_path / get_sub_str(sub_num)
+    subject_figures_path.mkdir(exist_ok=True)
+    fig.savefig(subject_figures_path / f'{get_sub_str(sub_num)}_tfr.png')
     
     conditions = tfr[0].metadata['event_name'].unique()
     tfr_avg = {condition: tfr[0][condition].average() for condition in conditions}
