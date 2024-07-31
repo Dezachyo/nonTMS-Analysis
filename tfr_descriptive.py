@@ -78,6 +78,7 @@ def plot_tfr_conditions(tfr, channel_name, baseline=(-0.4, 0), baseline_mode='pe
 # %%
 
 sub_list = [1,2,3,4,5,6,8,9,10,11]
+save_figs = False
 #sub_list = [8]
 # Define file paths and subject list
 current_path = pathlib.Path().absolute()
@@ -86,7 +87,7 @@ results_path = current_path / 'TFR'
 figures_path = current_path / 'Figures'
 figures_path.mkdir(exist_ok=True)
 
-tfr_files = [results_path /get_sub_str(sub_num) /f'{get_sub_str(sub_num)}-tfr.h5' for sub_num in sub_list]
+tfr_files = [results_path /get_sub_str(sub_num) /f'{get_sub_str(sub_num)}-tfr_80.h5' for sub_num in sub_list]
 
 # Read the TFR data
 group_tfr = []
@@ -97,17 +98,18 @@ for fname,sub_num in zip(tfr_files,sub_list):
     fig.suptitle(f'subjct {sub_num}')
 
    # Save the figure
-    subject_figures_path = figures_path / get_sub_str(sub_num)
-    subject_figures_path.mkdir(exist_ok=True)
-    fig.savefig(subject_figures_path / f'{get_sub_str(sub_num)}_tfr.png')
-    
+    if save_figs:
+        subject_figures_path = figures_path / get_sub_str(sub_num)
+        subject_figures_path.mkdir(exist_ok=True)
+        fig.savefig(subject_figures_path / f'{get_sub_str(sub_num)}_tfr.png')
+        
     conditions = tfr[0].metadata['event_name'].unique()
     tfr_avg = {condition: tfr[0][condition].average() for condition in conditions}
     group_tfr.append(tfr_avg)
     del(tfr)
 
 #%%
-occ_picks = ['PO4','PO8','POz','O2','Oz','PO3','PO7','Pz','Oz']
+occ_picks = ['PO4','PO8','POz','O2','PO3','PO7','Pz','Oz']
 
 for condition in conditions:
     grand = mne.grand_average([tfr_dict[condition] for tfr_dict in group_tfr])
