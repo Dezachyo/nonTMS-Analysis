@@ -1040,3 +1040,306 @@ def save_pdf_image(filename):
     pp.close()
 
 
+
+def create_cmw(srate, frex, fwhm, duration):
+    """
+    Create a complex Morlet wavelet.
+
+    Parameters:
+    srate (int): Sampling rate in Hz.
+    frex (float): Frequency of wavelet in Hz.
+    fwhm (float): Full width at half maximum of the Gaussian window in seconds.
+    duration (float): Total duration of the wavelet in seconds.
+
+    Returns:
+    cmw (numpy array): Complex Morlet wavelet.
+    time (numpy array): Time vector.
+    """
+    # Create time vector
+    time = np.linspace(-duration / 2, duration / 2, int(duration * srate) + 1)
+
+    # Create a complex-valued sine wave (wavelet)
+    sine_wave = np.exp(1j * 2 * np.pi * frex * time)
+
+    # Create Gaussian window
+    gaus_win = np.exp((-4 * np.log(2) * time**2) / (fwhm**2))
+
+    # Create Morlet wavelet
+    cmw = sine_wave * gaus_win
+
+    # Normalize the wavelet to have unit energy
+    cmw = cmw / np.sqrt(np.sum(np.abs(cmw)**2))
+
+    return cmw, time
+
+def plot_wavelet(cmw, time, frex, fwhm):
+    """
+    Plot the complex Morlet wavelet.
+
+    Parameters:
+    cmw (numpy array): Complex Morlet wavelet.
+    time (numpy array): Time vector.
+    frex (float): Frequency of wavelet in Hz.
+    fwhm (float): Full width at half maximum of the Gaussian window in seconds.
+    """
+    plt.figure(figsize=(12, 6))
+    plt.plot(time, np.real(cmw), 'b', label='Real part')
+    plt.plot(time, np.imag(cmw), 'r--', label='Imaginary part')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.legend()
+    plt.title(f'Complex Morlet wavelet (Frequency: {frex} Hz, FWHM: {fwhm} s)')
+    plt.show()
+
+
+
+def get_sub_str(sub_num):
+    zeros = (3- len(str(sub_num)))*'0' 
+    sub_str = f'sub_'+zeros+f'{sub_num}'
+    return sub_str
+
+
+
+def predict_phase_custom_wavelvet(signal,signal_times,time_to_predict,cmw,frex):
+
+
+    zero_time_idx = np.where(signal_times == time_to_predict)[0] # look for pulse idx
+
+    zero_time_idx = int(zero_time_idx)
+
+    # Ensure the wavelet length matches the segment length
+    wavelet_length = len(cmw)
+
+    half_wavelet_length = len(cmw) // 2
+
+    # Extract the signal segment preceding the zero time point
+    if zero_time_idx - wavelet_length < 0:
+        raise ValueError("Not enough data points before the zero time point to match the wavelet length.")
+    signal = np.squeeze(signal)
+    signal_segment = signal[zero_time_idx - wavelet_length: zero_time_idx]
+
+    # Extract the corresponding wavelet segment
+    #wavelet_segment = cmw[:len(signal_segment)]
+
+    # Compute the dot product
+    dot_product = np.dot(signal_segment, np.conj(cmw))
+
+    # Calculate the phase angle
+    phase_angle = np.angle(dot_product)
+
+    print(np.degrees(phase_angle))
+
+
+    estimate_time =  signal_times[zero_time_idx-half_wavelet_length]
+    pulse_time = time_to_predict
+
+    X = estimate_time # initial time point in seconds
+    Y = pulse_time  # later time point in seconds
+    
+    phase_X = phase_angle  # initial phase in radians
+    # Compute the phase at time Y
+    phase_Y = compute_phase_at_Y(phase_X, frex, X, Y)
+
+    # Convert radians to degrees and make sure to convert negative degrees to 180-360
+    phase_X_degrees = np.degrees(phase_X) % 360
+    phase_Y_degrees = np.degrees(phase_Y) % 360
+
+    print(f"Phase at time {X}s: {phase_X} radians ({phase_X_degrees} degrees)")
+    print(f"Phase at time {Y}s: {phase_Y} radians ({phase_Y_degrees} degrees)")
+    result = {
+    'estimate_phase': phase_X,
+    'estimate_time': estimate_time,
+    'prestim_phase_custom': phase_Y
+
+    }
+    
+    return result
+
+def compare_custom_wavelet_prediction(epochs_tep,phase_epochs_morlet,cmw,epoch_idx,time_to_predict,args):
+
+ 
+
+    signal = np.squeeze(epochs_tep.copy().pick(args.source_ch)[epoch_idx]._data)
+    phase_mne =  phase_epochs_morlet.copy().pick(args.source_ch)[epoch_idx]._data.squeeze()
+
+    t = epochs_tep.times
+    conv_result = np.convolve(signal, cmw, mode='same')
+
+    frex = int(args.freqs[0]) # convert str in a list to int
+    points =  predict_phase_custom_wavelvet(signal,epochs_tep.times,time_to_predict,cmw,frex)
+
+    #estimate_phase =  np.deg2rad(points['estimate_phase'])
+    estimate_phase =  points['estimate_phase']
+    estimate_time = points['estimate_time']
+    prestim_phase_deg_custom = points['prestim_phase_custom']
+
+    # Extract the instantaneous phase and amplitude
+    instantaneous_phase = np.angle(conv_result)
+    instantaneous_amplitude = np.abs(conv_result)
+
+    # Compute the power
+    instantaneous_power = instantaneous_amplitude ** 2
+
+    # Plotting the results
+    plt.figure(figsize=(12, 8))
+
+    # Original Signal
+    plt.subplot(4, 1, 1)
+    plt.plot(t, signal, label='Original Signal')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.title('Original Signal')
+    plt.legend()
+
+    # Instantaneous Phase
+    plt.subplot(4, 1, 2)
+    plt.plot(t, instantaneous_phase, label='Custom Wavelet', color='black')
+    plt.plot(t, phase_mne, label='MNE Wavelet', color='orange')
+    plt.scatter(estimate_time,estimate_phase, color='black')
+    plt.scatter(time_to_predict,prestim_phase_deg_custom, color='black')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Phase (radians)')
+    plt.title('Instantaneous Phase')
+    plt.legend()
+
+    # Instantaneous Amplitude
+    plt.subplot(4, 1, 3)
+    plt.plot(t, instantaneous_amplitude, label='Instantaneous Amplitude', color='green')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Amplitude')
+    plt.title('Instantaneous Amplitude')
+    plt.legend()
+
+    plt.tight_layout()
+
+def compute_phase_at_Y(phase_X, frex, X, Y):
+    # Calculate the phase difference
+    phase_difference = 2 * np.pi * frex * (Y - X)
+    
+    # Compute the phase at time Y
+    phase_Y = phase_X + phase_difference
+    
+    # Ensure the phase is within the range [-π, π)
+    phase_Y = np.angle(np.exp(1j * phase_Y))
+    
+    return phase_Y
+
+def plot_average_epochs(epochs_tep, source_ch):
+    """
+    Plots the average of epochs for each unique peak as subplots.
+
+    Parameters:
+    epochs_tep : mne.Epochs
+        The epochs data with metadata containing peaks.
+    source_ch : list or str
+        The channels to pick for averaging.
+
+    Returns:
+    fig : matplotlib.figure.Figure
+        The figure containing the subplots.
+    """
+    # Determine the unique peaks
+    unique_peaks = epochs_tep.metadata["peak"].unique()
+
+    # Number of unique peaks
+    num_peaks = len(unique_peaks)
+
+    # Create a figure with subplots
+    fig, axes = plt.subplots(nrows=num_peaks, ncols=1, figsize=(10, 3 * num_peaks))
+
+    # Ensure that axes is iterable in case of a single subplot
+    if num_peaks == 1:
+        axes = [axes]
+
+    # Loop over the unique peaks and plot the average for each
+    for ax, peak in zip(axes, unique_peaks):
+        avg = epochs_tep[epochs_tep.metadata["peak"] == peak].copy().pick(source_ch).average()
+        avg.plot(axes=ax, show=False)
+        ax.set_title(f'Average for peak: {peak}')
+
+    plt.tight_layout()
+    return fig
+
+def plot_compare_average_epochs(epochs_tep, args, ax):
+    # Extract data from MNE epochs
+    positive_epochs = epochs_tep[epochs_tep.metadata["peak"] == 'positive'].copy().pick(args.source_ch)
+    negative_epochs = epochs_tep[epochs_tep.metadata["peak"] == 'negative'].copy().pick(args.source_ch)
+
+    # Get the number of trials
+    num_positive_trials = len(positive_epochs)
+    num_negative_trials = len(negative_epochs)
+
+    # Extract the data and compute the average and SEM
+    positive_data = positive_epochs.get_data()
+    negative_data = negative_epochs.get_data()
+    
+    positive_avg = positive_data.mean(axis=0).squeeze()
+    negative_avg = negative_data.mean(axis=0).squeeze()
+    
+    positive_sem = positive_data.std(axis=0).squeeze() / np.sqrt(num_positive_trials)
+    negative_sem = negative_data.std(axis=0).squeeze() / np.sqrt(num_negative_trials)
+
+    # Extract times from epochs
+    times = positive_epochs.times
+
+    # Plot the data
+    ax.plot(times, negative_avg, color='blue', label=f'Negative Peaks (n={num_negative_trials})')
+    ax.fill_between(times, negative_avg - negative_sem, negative_avg + negative_sem, color='blue', alpha=0.3)
+    
+    ax.plot(times, positive_avg, color='red', label=f'Positive Peaks (n={num_positive_trials})')
+    ax.fill_between(times, positive_avg - positive_sem, positive_avg + positive_sem, color='red', alpha=0.3)
+
+    # Adding a vertical dotted line at time zero
+    ax.axvline(x=0, color='black', linestyle='--', linewidth=1)
+
+    # Adding titles and labels
+    ax.set_title('Average EEG Data for Positive and Negative Peaks')
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Amplitude (µV)')
+    ax.legend()
+    
+    # Adding grid with lines every 100 ms
+    ax.xaxis.set_major_locator(plt.MultipleLocator(0.1))  # 0.1 seconds = 100 ms
+    ax.grid(True)
+
+
+def plot_highlighted_psd_prestim(epochs, psd_kw, welch_kw, highlight_channel):
+    """
+    Plot the power spectral density (PSD) for all channels, highlighting one specified channel.
+    
+    Parameters:
+    epochs (mne.Epochs): The epochs object containing the data.
+    psd_kw (dict): Keyword arguments for the PSD computation.
+    welch_kw (dict): Additional keyword arguments for Welch's method.
+    highlight_channel (str): The name of the channel to highlight.
+    """
+    # Compute PSD
+    psd = epochs.copy().crop(tmin=-1, tmax=0).compute_psd(**psd_kw, **welch_kw)
+    
+    # Extract the data and frequencies
+    psd_data, freqs = psd.get_data(return_freqs=True)
+    channel_names = psd.ch_names
+    
+    # Convert PSD data to dB (10 * log10 of the data)
+    psd_data_db = 10 * np.log10(psd_data)
+    
+    # Find the index of the channel to highlight
+    highlight_idx = channel_names.index(highlight_channel)
+    
+    # Plot the PSD for all channels
+    plt.figure(figsize=(10, 6))
+    
+    # Plot all channels in grey
+    for idx, channel in enumerate(channel_names):
+        if idx == highlight_idx:
+            plt.plot(freqs, psd_data_db[idx].mean(axis=0), color='r', linewidth=2.5, label=highlight_channel)
+        else:
+            plt.plot(freqs, psd_data_db[idx].mean(axis=0), color='grey', alpha=0.5)
+    
+    # Add labels and title
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Power (dB)')
+    plt.title('Power Spectral Density')
+    plt.xscale('log')
+    plt.legend()
+    plt.show()
