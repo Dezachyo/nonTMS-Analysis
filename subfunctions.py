@@ -430,7 +430,7 @@ def plot_prestim_phase_dist_to_ax(degrees,ax):
     ax.set_theta_direction(-1)
     plt.show()
 
-def plot_peak_variation(df_metadata,args):
+def plot_peak_variation(df_metadata,column_name,args):
     # Assign colors to peak categories
     peak_colors = {'positive': 'tomato', 'negative': 'dodgerblue', 'neutral': 'gray'}
 
@@ -458,7 +458,7 @@ def plot_peak_variation(df_metadata,args):
     
     ax3 = fig.add_subplot(133, projection='polar')
 
-    degrees = df_metadata['prestim_phase_deg']
+    degrees = df_metadata[column_name]
     plot_prestim_phase_dist_to_ax(degrees,ax3)
     
     shaded_width = args.peak_width
@@ -509,12 +509,13 @@ def add_prestim_col (epochs_tep,phase_epochs,prestim_time,source_ch):
     
     return epochs_tep
 
-def add_peak_col(epochs_tep,peak_width):
+def add_peak_col(epochs_tep,peak_width,column_name):
     """Add pre-stimulation peak (negative,positive,neutral) to Epochs metadata (in-place)
 
     Args:
         epochs_tep (mne.Epochs): To be modified 
         peak_width (int): ±peak_width/2 to both direction
+        column_name: (str): name of column contains prestim phase (deg) in metadata
 
     Returns:
         mne.Epochs metadata modified
@@ -524,7 +525,7 @@ def add_peak_col(epochs_tep,peak_width):
     positive_peak_range = (360 - peak_width/2 , 0 + peak_width/2) 
     negative_peak_range = (180- peak_width/2,180 +peak_width/2) 
 
-    presim_phase_angles =  epochs_tep.metadata['prestim_phase_deg']
+    presim_phase_angles =  epochs_tep.metadata[column_name]
     
     positive_peak_index = np.where(np.logical_or(presim_phase_angles >= positive_peak_range[0], presim_phase_angles <= positive_peak_range[1]))[0]
     negative_peak_index =np.where(np.logical_and(presim_phase_angles >= negative_peak_range[0], presim_phase_angles <= negative_peak_range[1]))[0]
@@ -1155,6 +1156,30 @@ def predict_phase_custom_wavelvet(signal,signal_times,time_to_predict,cmw,frex):
     
     return result
 
+def point_by_conv(signal,signal_times,time_to_predict,cmw,frex):
+    
+    
+    conv_result = np.convolve(signal.squeeze(), cmw, mode='same')
+
+    instantaneous_phase = np.angle(conv_result)
+    instantaneous_amplitude = np.abs(conv_result)  
+    
+    time_idx = np.where(signal_times == time_to_predict)[0] 
+    time_idx = int(time_idx)
+    
+    
+    point_phase = instantaneous_phase[time_idx]
+    point_phase_deg = np.degrees(point_phase) % 360 # Convert radians to degrees and make sure to convert negative degrees to 180-360
+    point_amp = instantaneous_amplitude[time_idx]
+    result = {
+        'point_phase_conv': point_phase,
+        'point_phase_conv_deg': point_phase_deg,
+        'point_amp_conv': point_amp
+
+        }
+    
+    return result
+
 def compare_custom_wavelet_prediction(epochs_tep,phase_epochs_morlet,cmw,epoch_idx,time_to_predict,args):
 
  
@@ -1260,7 +1285,7 @@ def plot_average_epochs(epochs_tep, source_ch):
     plt.tight_layout()
     return fig
 
-def plot_compare_average_epochs(epochs_tep, args, ax):
+def plot_compare_average_epochs(epochs_tep, args, time_to_predict ,ax):
     # Extract data from MNE epochs
     positive_epochs = epochs_tep[epochs_tep.metadata["peak"] == 'positive'].copy().pick(args.source_ch)
     negative_epochs = epochs_tep[epochs_tep.metadata["peak"] == 'negative'].copy().pick(args.source_ch)
@@ -1290,7 +1315,7 @@ def plot_compare_average_epochs(epochs_tep, args, ax):
     ax.fill_between(times, positive_avg - positive_sem, positive_avg + positive_sem, color='red', alpha=0.3)
 
     # Adding a vertical dotted line at time zero
-    ax.axvline(x=0, color='black', linestyle='--', linewidth=1)
+    ax.axvline(x=time_to_predict, color='black', linestyle='--', linewidth=1)
 
     # Adding titles and labels
     ax.set_title('Average EEG Data for Positive and Negative Peaks')
