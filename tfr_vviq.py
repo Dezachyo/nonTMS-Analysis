@@ -6,6 +6,8 @@ import numpy as np
 import pathlib
 import mne
 from mne.time_frequency import tfr_morlet
+import seaborn as sns
+from matplotlib.colors import TwoSlopeNorm
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
@@ -80,6 +82,7 @@ below_median = pd.concat([below_median, median_rows])
 
 # %% Show Results
 
+save_fig = True
 
 for condition in conditions:
 
@@ -104,14 +107,26 @@ for condition in conditions:
     vmin = min(data_below.min(), data_above.min())
     vmax = max(data_below.max(), data_above.max())
 
+    cnorm = TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)  # min, center & max ERDS
+
     # Plot the TFRs side by side with the same color scale
     fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 
     # Plot TFR for the 'below' condition
-    grand_below.plot(combine='mean', axes=axes[0], vmin=vmin, vmax=vmax)
+    grand_below.plot(combine='mean',
+                     axes=axes[0],
+                     vmin=vmin,
+                     vmax=vmax,
+                     cnorm = cnorm
+                     )
 
     # Plot TFR for the 'above' condition
-    grand_above.plot(combine='mean', axes=axes[1], vmin=vmin, vmax=vmax)
+    grand_above.plot(combine='mean',
+                     axes=axes[1],
+                     vmin=vmin,
+                     vmax=vmax,
+                     cnorm = cnorm
+                     )
 
     fig.suptitle(f'{condition} \n {occ_picks}')
 
@@ -121,7 +136,10 @@ for condition in conditions:
     # Adjust layout
     plt.tight_layout()
     plt.show()
-    fig.savefig(f'Median Split VVVIQ {condition} occsipital.png', dpi=300, bbox_inches='tight')
+    if save_fig:
+        fig_path = current_path / 'Figures'/'vviq_induced_ocill'
+        fig.savefig(fig_path /f'Median Split_VVVIQ_{condition}_occsipital.png', dpi=300, bbox_inches='tight')
+
 
 #%% ------------------------------- Same as above but all conditions in one figure -------------------
 
@@ -151,14 +169,14 @@ for i, condition in enumerate(conditions):
     data_above = grand_above.data.mean(axis=0)
 
     # Determine the common color scale (vmin and vmax)
-    vmin = min(data_below.min(), data_above.min())
-    vmax = max(data_below.max(), data_above.max())
+    vmin = min(data_below.min(), data_above.min()) - 0.3
+    vmax = max(data_below.max(), data_above.max()) + 0.3
 
     # Plot TFR for the 'below' condition
-    grand_below.plot(combine='mean', axes=axes[i, 0], vmin=vmin, vmax=vmax, show=False)
+    grand_below.plot(combine='mean', axes=axes[i, 0], vmin=vmin, vmax=vmax,cnorm = cnorm, show=False)
 
     # Plot TFR for the 'above' condition
-    grand_above.plot(combine='mean', axes=axes[i, 1], vmin=vmin, vmax=vmax, show=False)
+    grand_above.plot(combine='mean', axes=axes[i, 1], vmin=vmin, vmax=vmax,cnorm = cnorm, show=False)
 
     # Set titles for the plots
     axes[i, 0].set_title(f'{condition} - Low VVIQ')
@@ -173,8 +191,9 @@ plt.subplots_adjust(hspace=0.4, wspace=0.3)
 
 # Add an overall title to the figure
 fig.suptitle('TFR Comparison Across Conditions', fontsize=16, y=1.02)
-
+plt.tight_layout()
 plt.show()
+
 
 
 
