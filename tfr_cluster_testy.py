@@ -113,7 +113,7 @@ for fname,sub_num in zip(tfr_files,sub_list):
 
 #%% Permutation test
 
-n_permutations = 500
+n_permutations = 1000
 p_value_threshold = 0.05 # Cluster correction 
 
 occ_picks = ['PO4','PO8','POz','O2','PO3','PO7','Pz','Oz']
