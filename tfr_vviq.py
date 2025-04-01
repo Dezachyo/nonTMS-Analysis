@@ -133,6 +133,8 @@ for condition in conditions:
     axes[0].set_title(f'Low VVIQ')
 
     axes[1].set_title(f'High VVIQ')
+    
+    
     # Adjust layout
     plt.tight_layout()
     plt.show()
@@ -144,13 +146,13 @@ for condition in conditions:
 #%% ------------------------------- Same as above but all conditions in one figure -------------------
 
 
-
+cnorm = TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)  # min, center & max
 # Adjust the figure size to be taller and less wide, aiming for more square-like subplots
 fig, axes = plt.subplots(len(conditions), 2, figsize=(8, 8 * len(conditions)))
 
 # Define the range of time (x-axis) based on your data
-time_range = np.linspace(-0.5, 1.0, 5)  # Adjust the number of ticks here (e.g., 5 ticks)
-
+time_range = np.linspace(-0.4, 1.0, 7)  # Adjust the number of ticks here (e.g., 5 ticks)
+time_range = np.array([-0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8])
 # Loop through each condition and plot the TFRs
 for i, condition in enumerate(conditions):
     
@@ -186,6 +188,9 @@ for i, condition in enumerate(conditions):
     axes[i, 0].set_xticks(time_range)
     axes[i, 1].set_xticks(time_range)
 
+    axes[i, 0].axvline(x=0, color='black', linestyle='--')
+    axes[i, 1].axvline(x=0, color='black', linestyle='--')
+    
 # Adjust layout
 plt.subplots_adjust(hspace=0.4, wspace=0.3)
 
